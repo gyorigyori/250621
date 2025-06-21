@@ -11,6 +11,7 @@ d_day = datetime(2025, 7, 21, 10, 0, 0)
 
 # 타이머 표시 공간
 timer_placeholder = st.empty()
+st.image("https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHN1MWg0NXY0ZTJ4djJjaWI5dHVyNXp2ZmtmYXB0M2dpemxpYmQ0MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/JWybLzXs7Hn0JKhSji/giphy.gif")
 
 # 타이머 루프
 while True:
@@ -31,4 +32,3 @@ while True:
     timer_placeholder.markdown(f"<h2 style='text-align: center;'>{countdown_str}</h2>", unsafe_allow_html=True)
 
     time.sleep(0.05)  # 약 20fps 정도의 업데이트 속도
-st.image("https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExbHN1MWg0NXY0ZTJ4djJjaWI5dHVyNXp2ZmtmYXB0M2dpemxpYmQ0MyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/JWybLzXs7Hn0JKhSji/giphy.gif")
