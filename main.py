@@ -1,5 +1,5 @@
 import streamlit as st
-
+print("hello")
 # 🧠 MBTI와 직업 매핑
 mbti_jobs = {
     "INTJ": ["🔬 과학자", "📊 데이터 분석가", "💻 소프트웨어 엔지니어"],
