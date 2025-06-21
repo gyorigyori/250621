@@ -67,7 +67,7 @@ box_html = f"""
 """
 
 # 클릭 핸들링 (클릭 시 실제 Python 처리)
-clicked = st.button("⬛ 상자 클릭하기", on_click=handle_click, disabled=st.session_state.status != "clickable")
+clicked = st.button("여기를 클릭", on_click=handle_click, disabled=st.session_state.status != "clickable")
 
 st.markdown(box_html, unsafe_allow_html=True)
 
