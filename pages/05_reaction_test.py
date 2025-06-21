@@ -1,74 +1,77 @@
 import streamlit as st
 import time
 import random
-import pandas as pd
 
 st.set_page_config(page_title="반응속도 테스트", layout="centered")
-
 st.title("⚡ 반응속도 테스트")
-st.markdown("닉네임을 입력하고 테스트를 시작하세요!")
-
-# 사용자 닉네임 입력
-nickname = st.text_input("닉네임", max_chars=20)
 
 # 세션 상태 초기화
+if "status" not in st.session_state:
+    st.session_state.status = "ready"  # ready, waiting, clickable, done
 if "start_time" not in st.session_state:
     st.session_state.start_time = None
 if "reaction_time" not in st.session_state:
     st.session_state.reaction_time = None
-if "test_ready" not in st.session_state:
-    st.session_state.test_ready = False
-if "can_click" not in st.session_state:
-    st.session_state.can_click = False
-if "leaderboard" not in st.session_state:
-    st.session_state.leaderboard = []
 
-# 테스트 시작 로직
-def start_test():
+# 초기화 함수
+def reset():
+    st.session_state.status = "ready"
+    st.session_state.start_time = None
     st.session_state.reaction_time = None
-    st.session_state.test_ready = True
-    st.session_state.can_click = False
-    delay = random.uniform(2, 5)
 
-    placeholder = st.empty()
-    placeholder.markdown('<div style="height:300px; background-color:red;"></div>', unsafe_allow_html=True)
-    time.sleep(delay)
-
-    st.session_state.start_time = time.time()
-    st.session_state.can_click = True
-    placeholder.markdown('<div style="height:300px; background-color:green;"></div>', unsafe_allow_html=True)
-    
-    if st.button("지금 클릭!"):
-        register_reaction()
-
-# 반응 기록
-def register_reaction():
-    if st.session_state.can_click and st.session_state.start_time:
+# 클릭 핸들링
+def handle_click():
+    if st.session_state.status == "clickable":
         rt = time.time() - st.session_state.start_time
         st.session_state.reaction_time = rt
-        st.success(f"⏱ 반응속도: {rt:.3f} 초")
-        st.session_state.can_click = False
+        st.session_state.status = "done"
 
-        # 리더보드에 기록 추가
-        st.session_state.leaderboard.append({"닉네임": nickname, "반응속도": rt})
-    else:
-        st.warning("아직 초록 화면이 아닙니다!")
+# 테스트 시작
+def start_test():
+    st.session_state.status = "waiting"
+    delay = random.uniform(2, 5)
+    time.sleep(delay)
+    st.session_state.status = "clickable"
+    st.session_state.start_time = time.time()
 
-# 닉네임 없으면 테스트 비활성화
-if nickname.strip() == "":
-    st.warning("닉네임을 입력하세요.")
-else:
-    if st.button("테스트 시작", disabled=st.session_state.test_ready):
+# 시작 버튼
+if st.session_state.status == "ready":
+    if st.button("테스트 시작"):
         start_test()
 
-# 리더보드 표시
-if st.session_state.leaderboard:
-    st.subheader("🏆 리더보드 (빠른 순)")
-    df = pd.DataFrame(st.session_state.leaderboard)
-    df = df.sort_values("반응속도").reset_index(drop=True)
-    st.dataframe(df.style.highlight_min("반응속도", color="lightgreen"), use_container_width=True)
+# 박스와 텍스트 출력
+box_label = ""
+box_color = "gray"
 
-# 초기화 버튼
-if st.button("리더보드 초기화"):
-    st.session_state.leaderboard = []
-    st.success("리더보드를 초기화했습니다.")
+if st.session_state.status == "waiting":
+    box_label = "wait"
+    box_color = "red"
+
+elif st.session_state.status == "clickable":
+    box_label = "click"
+    box_color = "green"
+
+elif st.session_state.status == "done":
+    box_label = f"{st.session_state.reaction_time:.3f} 초"
+    box_color = "blue"
+
+# 상자 UI
+box_html = f"""
+<div onclick="fetch('/_stcore/handle_click')" 
+     style='width: 300px; height: 200px; background-color: {box_color}; 
+     display: flex; align-items: center; justify-content: center; 
+     font-size: 30px; font-weight: bold; color: white; cursor: pointer; 
+     border-radius: 15px; margin: 30px auto;'>
+    {box_label}
+</div>
+"""
+
+# 클릭 핸들링 (클릭 시 실제 Python 처리)
+clicked = st.button("⬛ 상자 클릭하기", on_click=handle_click, disabled=st.session_state.status != "clickable")
+
+st.markdown(box_html, unsafe_allow_html=True)
+
+# 다시하기 버튼
+if st.session_state.status == "done":
+    if st.button("🔁 다시하기"):
+        reset()
