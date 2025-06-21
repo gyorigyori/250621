@@ -1,4 +1,6 @@
 streamlit
+folium
+streamlit_folium
 pandas
 matplotlib
 beautifulsoup4
